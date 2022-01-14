@@ -1,5 +1,11 @@
 import AsyncStorage from "@react-native-community/async-storage";
-import { AUTH_LOGIN, AUTH_LOGOUT, AUTH_USER_UPDATE, COUNT_LESSONS, USER_LESSONS } from "../types";
+import {
+  AUTH_LOGIN,
+  AUTH_LOGOUT,
+  AUTH_USER_UPDATE,
+  COUNT_LESSONS,
+  USER_LESSONS,
+} from "../types";
 import { SETTINGS } from "../../../settings";
 
 // логинимся в бд
@@ -83,27 +89,24 @@ export const logout = () => ({
 //получаем количество оставшихся занятий
 export const getCountLessons = (token) => {
   return async (dispatch) => {
-      let response = await fetch(SETTINGS.URL + "/api/getRemainLessons", {
-        headers: {
-          token: token
-        }
-      });
-      
-      if (response)
-      {
-        let json = await response.json();        
+    let response = await fetch(SETTINGS.URL + "/api/getRemainLessons", {
+      headers: {
+        token: token,
+      },
+    });
 
-        dispatch({
-          type: COUNT_LESSONS,
-          payload: {
-            countLessons: json.remained_lessons
-          }
-        });
-      }
-      else
-      {
-        alert("Ошибка HTTP");
-      }    
+    if (response) {
+      let json = await response.json();
+
+      dispatch({
+        type: COUNT_LESSONS,
+        payload: {
+          countLessons: json.remained_lessons,
+        },
+      });
+    } else {
+      alert("Ошибка HTTP");
+    }
   };
 };
 
@@ -146,39 +149,32 @@ export const getUserLessons = () => {
 
     var tokenFormat = () => {
       return AsyncStorage.getItem("user_jwt").then((value) => {
-        if(value != null)
-        {
+        if (value != null) {
           return value;
         }
-      })
-    }
+      });
+    };
 
     tkn = await tokenFormat();
-    
+
     let response = await fetch(SETTINGS.URL + "/api/getStudentRecords", {
       headers: {
-        token: tkn
-      }
+        token: tkn,
+      },
     });
-    
-    if (response)
-    {
+
+    if (response) {
       let json = await response.json();
-      if(json.success)
-      {
+      if (json.success) {
         dispatch({
           type: USER_LESSONS,
           payload: { userLessons: json.success },
         });
-      }
-      else
-      {
+      } else {
         console.log(json.error);
       }
-    }
-    else
-    {
+    } else {
       alert("Ошибка HTTP");
-    }    
+    }
   };
 };
